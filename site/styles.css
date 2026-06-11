@@ -1,14 +1,36 @@
-:root {
-  --bg: #0f172a;
-  --panel: #111827;
-  --panel-2: #1f2937;
-  --text: #e5e7eb;
-  --muted: #94a3b8;
-  --primary: #2563eb;
-  --primary-hover: #1d4ed8;
-  --border: #334155;
+/* ─── Design tokens ──────────────────────────────────────── */
+@font-face {
+  font-family: "Ryker";
+  src: url("https://www.cegos.fr/assets/fonts/ryker/Ryker-Medium.otf") format("opentype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
 }
 
+:root {
+  /* Colors */
+  --color-bg: #ffffff;
+  --color-text: #1d0000;
+  --color-accent: #e6233a;
+  --color-border: #e5e7eb;
+  --color-card-bg: #ffffff;
+
+  /* Typography */
+  --font-base: "Raleway", sans-serif;
+  --font-heading-2: "Ryker", sans-serif;
+
+  /* Spacing */
+  --space-xs: 6px;
+  --space-sm: 16px;
+  --space-md: 30px;
+  --space-lg: 40px;
+  --space-xl: 100px;
+
+  /* Shadow */
+  --shadow-sm: rgba(0, 0, 0, 0.1) 0px -2px 10px 0px;
+}
+
+/* ─── Reset ──────────────────────────────────────────────── */
 * {
   box-sizing: border-box;
 }
@@ -17,87 +39,146 @@ html,
 body {
   margin: 0;
   padding: 0;
-  font-family: Arial, sans-serif;
-  background: linear-gradient(180deg, var(--bg), #020617);
-  color: var(--text);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-base);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
 }
 
+/* ─── Layout ─────────────────────────────────────────────── */
 .container {
   max-width: 960px;
   margin: 0 auto;
-  padding: 48px 20px 64px;
+  padding: var(--space-lg) 20px var(--space-xl);
 }
 
+/* ─── Hero ───────────────────────────────────────────────── */
 .hero {
-  margin-bottom: 32px;
+  margin-bottom: var(--space-lg);
 }
 
 .eyebrow {
-  color: #93c5fd;
+  color: var(--color-accent);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-size: 12px;
-  margin-bottom: 8px;
+  font-family: var(--font-base);
+  margin-bottom: var(--space-xs);
 }
 
 .hero h1 {
-  margin: 0 0 12px;
-  font-size: 44px;
-  line-height: 1.1;
+  margin: 0 0 var(--space-sm);
+  font-family: var(--font-base);
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 38px;
+  letter-spacing: 0px;
+  color: var(--color-text);
 }
 
 .lead {
   max-width: 720px;
-  font-size: 18px;
-  color: var(--muted);
+  font-family: var(--font-base);
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--color-text);
 }
 
 .hero__actions {
   display: flex;
-  gap: 12px;
+  gap: var(--space-sm);
   flex-wrap: wrap;
-  margin-top: 24px;
+  margin-top: var(--space-md);
 }
 
+/* ─── Buttons ────────────────────────────────────────────── */
 .button {
+  box-sizing: border-box;
   display: inline-block;
-  background: var(--primary);
-  color: white;
+  min-width: 117px;
+  min-height: 32px;
+  background-color: var(--color-accent);
+  color: #ffffff;
+  border: 0px none #ffffff;
+  border-radius: 40px;
+  padding: 8px 15px;
+  font-size: 13.7234px;
+  font-weight: 400;
+  font-family: var(--font-base);
   text-decoration: none;
-  padding: 12px 18px;
-  border-radius: 10px;
-  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
 }
 
 .button:hover {
-  background: var(--primary-hover);
+  opacity: 0.88;
 }
 
 .button--secondary {
-  background: transparent;
-  border: 1px solid var(--border);
+  background-color: var(--color-accent);
 }
 
+/* ─── Cards ──────────────────────────────────────────────── */
 .card {
-  background: rgba(17, 24, 39, 0.8);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 24px;
-  margin-bottom: 20px;
+  background-color: var(--color-card-bg);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: var(--space-sm);
+  margin-bottom: var(--space-md);
+  box-shadow: var(--shadow-sm);
 }
 
 .card h2 {
   margin-top: 0;
+  font-family: var(--font-heading-2);
+  font-size: 27px;
+  font-weight: 500;
+  line-height: 38px;
+  letter-spacing: 0%;
+  color: var(--color-text);
 }
 
+/* ─── Typography ─────────────────────────────────────────── */
+h3 {
+  font-family: var(--font-base);
+  font-size: 23px;
+  font-weight: 500;
+  line-height: 25px;
+  letter-spacing: 0px;
+  color: var(--color-text);
+}
+
+h4 {
+  font-family: var(--font-base);
+  font-size: 19px;
+  font-weight: 500;
+  line-height: 19.3084px;
+  letter-spacing: 0px;
+  color: var(--color-text);
+}
+
+p {
+  font-family: var(--font-base);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  letter-spacing: 0px;
+}
+
+/* ─── Misc ───────────────────────────────────────────────── */
 .examples {
   display: grid;
-  gap: 8px;
+  gap: var(--space-xs);
   padding-left: 18px;
 }
 
 code {
-  background: var(--panel-2);
+  background-color: #f3f4f6;
+  color: var(--color-text);
   padding: 2px 6px;
   border-radius: 6px;
+  font-size: 14px;
 }
