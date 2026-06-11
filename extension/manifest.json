@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "CEGOS Env Switcher",
+  "version": "0.1.0",
+  "description": "Switch quickly between prod, preprod and localhost for CEGOS URLs.",
+  "permissions": ["tabs"],
+  "host_permissions": [
+    "https://*.cegos.*/*",
+    "https://*.cegoc.*/*",
+    "https://*.ib-formation.*/*",
+    "https://*.localhost/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "CEGOS Env Switcher",
+    "default_popup": "popup.html"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}
