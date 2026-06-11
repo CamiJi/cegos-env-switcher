@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CEGOS Env Switcher</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <main class="popup">
+      <header class="popup__header">
+        <h1>CEGOS Env Switcher</h1>
+        <p id="current-host" class="popup__host"></p>
+      </header>
+
+      <section id="supported-view" hidden>
+        <div class="status">
+          <span class="status__label">Environnement courant</span>
+          <strong id="current-env" class="status__value"></strong>
+        </div>
+
+        <div class="actions">
+          <button id="btn-prod">Prod</button>
+          <button id="btn-preprod">Preprod</button>
+          <button id="btn-localhost">Localhost</button>
+        </div>
+      </section>
+
+      <section id="unsupported-view" hidden>
+        <p class="unsupported">
+          URL non supportée. Cette extension fonctionne uniquement sur les domaines CEGOS.
+        </p>
+      </section>
+    </main>
+
+    <script src="env.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>
