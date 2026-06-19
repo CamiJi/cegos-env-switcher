@@ -1,5 +1,6 @@
 const ALLOWED_CANONICAL_HOST_PATTERNS = [
   /(^|\.)cegos\.[a-z.]+$/i,
+  /(^|\.)cegos-integrata\.[a-z.]+$/i,
   /(^|\.)cegoc\.[a-z.]+$/i,
   /(^|\.)ib-formation\.[a-z.]+$/i
 ];
