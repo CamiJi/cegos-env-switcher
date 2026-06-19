@@ -6,6 +6,7 @@
   "permissions": ["tabs"],
   "host_permissions": [
     "https://*.cegos.*/*",
+    "https://*.cegos-integrata.*/*",
     "https://*.cegoc.*/*",
     "https://*.ib-formation.*/*",
     "https://*.localhost/*"
