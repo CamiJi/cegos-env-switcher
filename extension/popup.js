@@ -5,10 +5,23 @@ const ENV_LABELS = {
   [ENV.UNSUPPORTED]: "Non supporté"
 };
 
-const IS_MAC_PLATFORM = /mac/i.test(navigator.platform || "");
+function getPlatform() {
+  if (navigator.userAgentData && navigator.userAgentData.platform) {
+    return navigator.userAgentData.platform;
+  }
+
+  return navigator.platform || "";
+}
+
+const IS_MAC_PLATFORM = /mac/i.test(getPlatform());
 
 function shouldOpenInNewTabWithModifier(event) {
   return IS_MAC_PLATFORM ? event.metaKey : event.ctrlKey;
+}
+
+async function openTargetInNewTab(targetUrl) {
+  await chrome.tabs.create({ url: targetUrl });
+  window.close();
 }
 
 async function getCurrentTab() {
@@ -59,12 +72,11 @@ function configureButton(buttonId, targetEnv, currentEnv, targetUrl, tabId) {
     const openInNewTab = shouldOpenInNewTabWithModifier(event);
 
     if (openInNewTab) {
-      await chrome.tabs.create({ url: targetUrl });
+      await openTargetInNewTab(targetUrl);
     } else {
       await chrome.tabs.update(tabId, { url: targetUrl });
+      window.close();
     }
-
-    window.close();
   });
 
   button.addEventListener("auxclick", async (event) => {
@@ -73,8 +85,7 @@ function configureButton(buttonId, targetEnv, currentEnv, targetUrl, tabId) {
     }
 
     event.preventDefault();
-    await chrome.tabs.create({ url: targetUrl });
-    window.close();
+    await openTargetInNewTab(targetUrl);
   });
 }
 
