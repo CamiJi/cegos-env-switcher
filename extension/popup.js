@@ -53,6 +53,16 @@ function configureButton(buttonId, targetEnv, currentEnv, targetUrl, tabId) {
     await chrome.tabs.update(tabId, { url: targetUrl });
     window.close();
   });
+
+  button.addEventListener("auxclick", async (event) => {
+    if (event.button !== 1) {
+      return;
+    }
+
+    event.preventDefault();
+    await chrome.tabs.create({ url: targetUrl });
+    window.close();
+  });
 }
 
 async function initPopup() {
