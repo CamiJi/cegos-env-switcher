@@ -32,6 +32,16 @@ function setCurrentEnv(env) {
   document.getElementById("current-env").textContent = ENV_LABELS[env] || env;
 }
 
+async function openTargetUrl(tabId, targetUrl, openInNewTab) {
+  if (openInNewTab) {
+    await chrome.tabs.create({ url: targetUrl });
+  } else {
+    await chrome.tabs.update(tabId, { url: targetUrl });
+  }
+
+  window.close();
+}
+
 function configureButton(buttonId, targetEnv, currentEnv, targetUrl, tabId) {
   const button = document.getElementById(buttonId);
 
@@ -50,8 +60,16 @@ function configureButton(buttonId, targetEnv, currentEnv, targetUrl, tabId) {
   button.classList.remove("is-current");
 
   button.addEventListener("click", async () => {
-    await chrome.tabs.update(tabId, { url: targetUrl });
-    window.close();
+    await openTargetUrl(tabId, targetUrl, false);
+  });
+
+  button.addEventListener("auxclick", async (event) => {
+    if (event.button !== 1) {
+      return;
+    }
+
+    event.preventDefault();
+    await openTargetUrl(tabId, targetUrl, true);
   });
 }
 
