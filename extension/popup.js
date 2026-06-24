@@ -5,10 +5,7 @@ const ENV_LABELS = {
   [ENV.UNSUPPORTED]: "Non supporté"
 };
 
-const IS_MAC_PLATFORM = (() => {
-  const platform = navigator.userAgentData?.platform || navigator.platform || "";
-  return /mac/i.test(platform);
-})();
+const IS_MAC_PLATFORM = /mac/i.test(navigator.platform || "");
 
 function shouldOpenInNewTabWithModifier(event) {
   return IS_MAC_PLATFORM ? event.metaKey : event.ctrlKey;
@@ -59,13 +56,14 @@ function configureButton(buttonId, targetEnv, currentEnv, targetUrl, tabId) {
   button.classList.remove("is-current");
 
   button.addEventListener("click", async (event) => {
-    if (shouldOpenInNewTabWithModifier(event)) {
+    const openInNewTab = shouldOpenInNewTabWithModifier(event);
+
+    if (openInNewTab) {
       await chrome.tabs.create({ url: targetUrl });
-      window.close();
-      return;
+    } else {
+      await chrome.tabs.update(tabId, { url: targetUrl });
     }
 
-    await chrome.tabs.update(tabId, { url: targetUrl });
     window.close();
   });
 
