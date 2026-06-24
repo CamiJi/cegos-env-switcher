@@ -83,6 +83,12 @@ body {
   border-color: #2da44e;
 }
 
+.popup__hint {
+  margin: 12px 0 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
 .unsupported {
   margin: 0;
   font-size: 14px;

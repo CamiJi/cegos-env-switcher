@@ -19,11 +19,6 @@ function shouldOpenInNewTabWithModifier(event) {
   return IS_MAC_PLATFORM ? event.metaKey : event.ctrlKey;
 }
 
-async function openTargetInNewTab(targetUrl) {
-  await chrome.tabs.create({ url: targetUrl });
-  window.close();
-}
-
 async function getCurrentTab() {
   const tabs = await chrome.tabs.query({
     active: true,
@@ -51,6 +46,16 @@ function setCurrentEnv(env) {
   document.getElementById("current-env").textContent = ENV_LABELS[env] || env;
 }
 
+async function openTargetUrl(tabId, targetUrl, openInNewTab) {
+  if (openInNewTab) {
+    await chrome.tabs.create({ url: targetUrl });
+  } else {
+    await chrome.tabs.update(tabId, { url: targetUrl });
+  }
+
+  window.close();
+}
+
 function configureButton(buttonId, targetEnv, currentEnv, targetUrl, tabId) {
   const button = document.getElementById(buttonId);
 
@@ -70,13 +75,7 @@ function configureButton(buttonId, targetEnv, currentEnv, targetUrl, tabId) {
 
   button.addEventListener("click", async (event) => {
     const openInNewTab = shouldOpenInNewTabWithModifier(event);
-
-    if (openInNewTab) {
-      await openTargetInNewTab(targetUrl);
-    } else {
-      await chrome.tabs.update(tabId, { url: targetUrl });
-      window.close();
-    }
+    await openTargetUrl(tabId, targetUrl, openInNewTab);
   });
 
   button.addEventListener("auxclick", async (event) => {
@@ -85,7 +84,7 @@ function configureButton(buttonId, targetEnv, currentEnv, targetUrl, tabId) {
     }
 
     event.preventDefault();
-    await openTargetInNewTab(targetUrl);
+    await openTargetUrl(tabId, targetUrl, true);
   });
 }
 
