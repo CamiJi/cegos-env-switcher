@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "CEGOS Env Switcher",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Switch quickly between prod, preprod and localhost for CEGOS URLs.",
   "permissions": ["tabs"],
   "host_permissions": [
