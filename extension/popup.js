@@ -5,6 +5,20 @@ const ENV_LABELS = {
   [ENV.UNSUPPORTED]: "Non supporté"
 };
 
+function getPlatform() {
+  if (navigator.userAgentData && navigator.userAgentData.platform) {
+    return navigator.userAgentData.platform;
+  }
+
+  return navigator.platform || "";
+}
+
+const IS_MAC_PLATFORM = /mac/i.test(getPlatform());
+
+function shouldOpenInNewTabWithModifier(event) {
+  return IS_MAC_PLATFORM ? event.metaKey : event.ctrlKey;
+}
+
 async function getCurrentTab() {
   const tabs = await chrome.tabs.query({
     active: true,
@@ -59,8 +73,9 @@ function configureButton(buttonId, targetEnv, currentEnv, targetUrl, tabId) {
   button.disabled = false;
   button.classList.remove("is-current");
 
-  button.addEventListener("click", async () => {
-    await openTargetUrl(tabId, targetUrl, false);
+  button.addEventListener("click", async (event) => {
+    const openInNewTab = shouldOpenInNewTabWithModifier(event);
+    await openTargetUrl(tabId, targetUrl, openInNewTab);
   });
 
   button.addEventListener("auxclick", async (event) => {
