@@ -49,7 +49,13 @@ function configureButton(buttonId, targetEnv, currentEnv, targetUrl, tabId) {
   button.disabled = false;
   button.classList.remove("is-current");
 
-  button.addEventListener("click", async () => {
+  button.addEventListener("click", async (event) => {
+    if (event.metaKey || event.ctrlKey) {
+      await chrome.tabs.create({ url: targetUrl });
+      window.close();
+      return;
+    }
+
     await chrome.tabs.update(tabId, { url: targetUrl });
     window.close();
   });
