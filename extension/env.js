@@ -124,7 +124,13 @@ function getBombTestUrls(targetEnv) {
     return [];
   }
 
-  return BOMB_TEST_CANONICAL_HOSTS.map((hostname) => buildHostnameForEnv(hostname, targetEnv))
-    .filter(Boolean)
-    .map((hostname) => `https://${hostname}/`);
+  return BOMB_TEST_CANONICAL_HOSTS.reduce((urls, hostname) => {
+    const targetHostname = buildHostnameForEnv(hostname, targetEnv);
+
+    if (targetHostname) {
+      urls.push(`https://${targetHostname}/`);
+    }
+
+    return urls;
+  }, []);
 }
