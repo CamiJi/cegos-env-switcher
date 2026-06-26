@@ -56,6 +56,20 @@ async function openTargetUrl(tabId, targetUrl, openInNewTab) {
   window.close();
 }
 
+async function openBombTest(targetEnv) {
+  const targetUrls = getBombTestUrls(targetEnv);
+
+  if (!targetUrls.length) {
+    return;
+  }
+
+  for (const targetUrl of targetUrls) {
+    await chrome.tabs.create({ url: targetUrl });
+  }
+
+  window.close();
+}
+
 function configureButton(buttonId, targetEnv, currentEnv, targetUrl, tabId) {
   const button = document.getElementById(buttonId);
 
@@ -85,6 +99,21 @@ function configureButton(buttonId, targetEnv, currentEnv, targetUrl, tabId) {
 
     event.preventDefault();
     await openTargetUrl(tabId, targetUrl, true);
+  });
+}
+
+function configureBombTestButton(buttonId, currentEnv) {
+  const button = document.getElementById(buttonId);
+  const targetUrls = getBombTestUrls(currentEnv);
+
+  if (!targetUrls.length || currentEnv === ENV.UNSUPPORTED) {
+    button.disabled = true;
+    return;
+  }
+
+  button.disabled = false;
+  button.addEventListener("click", async () => {
+    await openBombTest(currentEnv);
   });
 }
 
@@ -122,6 +151,7 @@ async function initPopup() {
   configureButton("btn-prod", ENV.PROD, result.currentEnv, result.urls[ENV.PROD], tab.id);
   configureButton("btn-preprod", ENV.PREPROD, result.currentEnv, result.urls[ENV.PREPROD], tab.id);
   configureButton("btn-localhost", ENV.LOCALHOST, result.currentEnv, result.urls[ENV.LOCALHOST], tab.id);
+  configureBombTestButton("btn-bomb-test", result.currentEnv);
 }
 
 initPopup();

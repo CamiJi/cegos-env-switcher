@@ -12,6 +12,15 @@ const ENV = {
   UNSUPPORTED: "unsupported"
 };
 
+const BOMB_TEST_CANONICAL_HOSTS = [
+  "www.cegos.fr",
+  "www.cegos-integrata.de",
+  "www.cegos.es",
+  "www.cegos.it",
+  "www.ib-formation.fr",
+  "www.cegos.com"
+];
+
 function getCanonicalProdHostname(hostname) {
   let result = hostname;
 
@@ -108,4 +117,14 @@ function getAvailableTargets(rawUrl) {
       urls: {}
     };
   }
+}
+
+function getBombTestUrls(targetEnv) {
+  if (![ENV.PROD, ENV.PREPROD, ENV.LOCALHOST].includes(targetEnv)) {
+    return [];
+  }
+
+  return BOMB_TEST_CANONICAL_HOSTS.map((hostname) => buildHostnameForEnv(hostname, targetEnv))
+    .filter(Boolean)
+    .map((hostname) => `https://${hostname}/`);
 }
