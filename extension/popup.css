@@ -83,6 +83,15 @@ body {
   border-color: #2da44e;
 }
 
+.actions button.bomb-test {
+  margin-top: 4px;
+  background: #24292f;
+}
+
+.actions button.bomb-test:hover:not(:disabled) {
+  background: #1b1f23;
+}
+
 .popup__hint {
   margin: 12px 0 0;
   font-size: 12px;
