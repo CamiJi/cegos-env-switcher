@@ -117,7 +117,40 @@ function configureBombTestButton(buttonId, currentEnv) {
   });
 }
 
-async function initPopup() {
+function configureAdminButton(buttonId, tab) {
+  const button = document.getElementById(buttonId);
+  const url = new URL(tab.url);
+
+  if (url.pathname.startsWith("/wp-admin")) {
+    button.disabled = true;
+    button.classList.add("is-current");
+    return;
+  }
+
+  const adminUrl = new URL(tab.url);
+  adminUrl.pathname = "/wp-admin/";
+  adminUrl.search = "";
+  adminUrl.hash = "";
+
+  button.disabled = false;
+  button.classList.remove("is-current");
+
+  button.addEventListener("click", async (event) => {
+    const openInNewTab = shouldOpenInNewTabWithModifier(event);
+    await openTargetUrl(tab.id, adminUrl.toString(), openInNewTab);
+  });
+
+  button.addEventListener("auxclick", async (event) => {
+    if (event.button !== 1) {
+      return;
+    }
+
+    event.preventDefault();
+    await openTargetUrl(tab.id, adminUrl.toString(), true);
+  });
+}
+
+
   const tab = await getCurrentTab();
 
   if (!tab?.url) {
@@ -152,6 +185,7 @@ async function initPopup() {
   configureButton("btn-preprod", ENV.PREPROD, result.currentEnv, result.urls[ENV.PREPROD], tab.id);
   configureButton("btn-localhost", ENV.LOCALHOST, result.currentEnv, result.urls[ENV.LOCALHOST], tab.id);
   configureBombTestButton("btn-bomb-test", result.currentEnv);
+  configureAdminButton("btn-admin", tab);
 }
 
 initPopup();
