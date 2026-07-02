@@ -5,6 +5,11 @@ ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 DIST_DIR="$ROOT_DIR/site/downloads"
 TMP_DIR="$ROOT_DIR/.tmp/extension-package"
 ZIP_NAME="cegos-env-switcher.zip"
+CRX_NAME="cegos-env-switcher.crx"
+UPDATES_XML_PATH="$ROOT_DIR/site/updates.xml"
+MANIFEST_PATH="$ROOT_DIR/extension/manifest.json"
+PAGES_BASE_URL="${PAGES_BASE_URL:-https://camiji.github.io/cegos-env-switcher}"
+CHROME_EXTENSION_KEY_PATH="${CHROME_EXTENSION_KEY_PATH:-}"
 
 rm -rf "$TMP_DIR"
 mkdir -p "$TMP_DIR"
@@ -16,3 +21,91 @@ rm -f "$DIST_DIR/$ZIP_NAME"
 
 cd "$TMP_DIR"
 zip -r "$DIST_DIR/$ZIP_NAME" .
+
+if [[ -n "$CHROME_EXTENSION_KEY_PATH" ]]; then
+  if [[ ! -f "$CHROME_EXTENSION_KEY_PATH" ]]; then
+    echo "Error: CHROME_EXTENSION_KEY_PATH file not found: $CHROME_EXTENSION_KEY_PATH" >&2
+    exit 1
+  fi
+
+  rm -f "${TMP_DIR}.crx"
+  google-chrome \
+    --no-sandbox \
+    --pack-extension="$TMP_DIR" \
+    --pack-extension-key="$CHROME_EXTENSION_KEY_PATH"
+  if [[ ! -f "${TMP_DIR}.crx" ]]; then
+    echo "Error: CRX package was not generated." >&2
+    exit 1
+  fi
+  cp "${TMP_DIR}.crx" "$DIST_DIR/$CRX_NAME"
+  chmod 644 "$DIST_DIR/$CRX_NAME"
+
+  VERSION="$(python - "$MANIFEST_PATH" <<'PY'
+import json
+import sys
+
+manifest_path = sys.argv[1]
+try:
+    with open(manifest_path, encoding="utf-8") as manifest_file:
+        manifest = json.load(manifest_file)
+except FileNotFoundError:
+    print(f"Error: manifest file not found at {manifest_path}", file=sys.stderr)
+    sys.exit(1)
+except json.JSONDecodeError as exc:
+    print(f"Error: invalid JSON in {manifest_path}: {exc}", file=sys.stderr)
+    sys.exit(1)
+
+version = manifest.get("version")
+if not version:
+    print(f"Error: missing 'version' in {manifest_path}", file=sys.stderr)
+    sys.exit(1)
+
+print(version)
+PY
+)"
+  if [[ -z "$VERSION" ]]; then
+    echo "Error: extension version could not be read from manifest." >&2
+    exit 1
+  fi
+  APP_ID="$(python - "$CHROME_EXTENSION_KEY_PATH" <<'PY'
+import hashlib
+import subprocess
+import sys
+
+pem_path = sys.argv[1]
+try:
+    public_der = subprocess.check_output(
+        ["openssl", "rsa", "-in", pem_path, "-pubout", "-outform", "DER"],
+        stderr=subprocess.STDOUT,
+    )
+except subprocess.CalledProcessError as exc:
+    details = exc.output.decode(errors="replace").strip()
+    print(
+        f"Error: failed to extract public key from {pem_path}: {details or 'no output from openssl'}",
+        file=sys.stderr,
+    )
+    sys.exit(1)
+
+digest = hashlib.sha256(public_der).hexdigest()[:32]
+print("".join(chr(ord("a") + int(c, 16)) for c in digest))
+PY
+)"
+  if [[ -z "$APP_ID" ]]; then
+    echo "Error: extension app ID could not be generated from key." >&2
+    exit 1
+  fi
+
+  BASE_URL="${PAGES_BASE_URL%/}"
+  CRX_URL="$BASE_URL/downloads/$CRX_NAME"
+
+  cat > "$UPDATES_XML_PATH" <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<gupdate xmlns="http://www.google.com/update2/response" protocol="2.0">
+  <app appid="$APP_ID">
+    <updatecheck codebase="$CRX_URL" version="$VERSION" />
+  </app>
+</gupdate>
+EOF
+else
+  echo "Info: CHROME_EXTENSION_KEY_PATH not set, skipping CRX and updates.xml generation."
+fi

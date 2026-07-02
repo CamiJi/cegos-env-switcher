@@ -29,7 +29,22 @@ jobs:
       - name: Install zip
         run: sudo apt-get update && sudo apt-get install -y zip
 
+      - name: Prepare extension signing key
+        env:
+          CHROME_EXTENSION_PRIVATE_KEY: ${{ secrets.CHROME_EXTENSION_PRIVATE_KEY }}
+        run: |
+          if [ -z "$CHROME_EXTENSION_PRIVATE_KEY" ]; then
+            echo "Missing secret: CHROME_EXTENSION_PRIVATE_KEY" >&2
+            exit 1
+          fi
+          mkdir -p /tmp/cegos-extension-key
+          printf '%s' "$CHROME_EXTENSION_PRIVATE_KEY" > /tmp/cegos-extension-key/extension.pem
+          chmod 600 /tmp/cegos-extension-key/extension.pem
+
       - name: Package extension
+        env:
+          CHROME_EXTENSION_KEY_PATH: /tmp/cegos-extension-key/extension.pem
+          PAGES_BASE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
         run: bash scripts/package-extension.sh
 
       - name: Prepare artifact
