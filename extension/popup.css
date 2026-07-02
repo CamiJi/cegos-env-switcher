@@ -112,7 +112,7 @@ body {
   background: #5a32a3;
 }
 
-
+.unsupported {
   margin: 0;
   font-size: 14px;
   color: var(--muted);

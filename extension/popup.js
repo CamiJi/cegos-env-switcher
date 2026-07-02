@@ -121,23 +121,25 @@ function configureAdminButton(buttonId, tab) {
   const button = document.getElementById(buttonId);
   const url = new URL(tab.url);
 
-  if (url.pathname.startsWith("/wp-admin")) {
+  if (isAdminPage(url.hostname, url.pathname)) {
     button.disabled = true;
     button.classList.add("is-current");
     return;
   }
 
-  const adminUrl = new URL(tab.url);
-  adminUrl.pathname = "/wp-admin/";
-  adminUrl.search = "";
-  adminUrl.hash = "";
+  const adminUrl = buildAdminUrl(tab.url);
+
+  if (!adminUrl) {
+    button.disabled = true;
+    return;
+  }
 
   button.disabled = false;
   button.classList.remove("is-current");
 
   button.addEventListener("click", async (event) => {
     const openInNewTab = shouldOpenInNewTabWithModifier(event);
-    await openTargetUrl(tab.id, adminUrl.toString(), openInNewTab);
+    await openTargetUrl(tab.id, adminUrl, openInNewTab);
   });
 
   button.addEventListener("auxclick", async (event) => {
@@ -146,11 +148,12 @@ function configureAdminButton(buttonId, tab) {
     }
 
     event.preventDefault();
-    await openTargetUrl(tab.id, adminUrl.toString(), true);
+    await openTargetUrl(tab.id, adminUrl, true);
   });
 }
 
 
+async function initPopup() {
   const tab = await getCurrentTab();
 
   if (!tab?.url) {
