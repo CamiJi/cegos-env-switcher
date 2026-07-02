@@ -117,6 +117,42 @@ function configureBombTestButton(buttonId, currentEnv) {
   });
 }
 
+function configureAdminButton(buttonId, tab) {
+  const button = document.getElementById(buttonId);
+  const url = new URL(tab.url);
+
+  if (isAdminPage(url.hostname, url.pathname)) {
+    button.disabled = true;
+    button.classList.add("is-current");
+    return;
+  }
+
+  const adminUrl = buildAdminUrl(tab.url);
+
+  if (!adminUrl) {
+    button.disabled = true;
+    return;
+  }
+
+  button.disabled = false;
+  button.classList.remove("is-current");
+
+  button.addEventListener("click", async (event) => {
+    const openInNewTab = shouldOpenInNewTabWithModifier(event);
+    await openTargetUrl(tab.id, adminUrl, openInNewTab);
+  });
+
+  button.addEventListener("auxclick", async (event) => {
+    if (event.button !== 1) {
+      return;
+    }
+
+    event.preventDefault();
+    await openTargetUrl(tab.id, adminUrl, true);
+  });
+}
+
+
 async function initPopup() {
   const tab = await getCurrentTab();
 
@@ -152,6 +188,7 @@ async function initPopup() {
   configureButton("btn-preprod", ENV.PREPROD, result.currentEnv, result.urls[ENV.PREPROD], tab.id);
   configureButton("btn-localhost", ENV.LOCALHOST, result.currentEnv, result.urls[ENV.LOCALHOST], tab.id);
   configureBombTestButton("btn-bomb-test", result.currentEnv);
+  configureAdminButton("btn-admin", tab);
 }
 
 initPopup();

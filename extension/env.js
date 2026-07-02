@@ -134,3 +134,40 @@ function getBombTestUrls(targetEnv) {
     return urls;
   }, []);
 }
+
+function buildAdminUrl(rawUrl) {
+  try {
+    const url = new URL(rawUrl);
+    const currentEnv = detectEnvironment(url.hostname);
+
+    if (currentEnv === ENV.UNSUPPORTED) {
+      return null;
+    }
+
+    const canonical = getCanonicalProdHostname(url.hostname);
+    const adminCanonical = canonical.startsWith("www.")
+      ? "admin." + canonical.slice("www.".length)
+      : canonical;
+
+    const adminHostname = buildHostnameForEnv(adminCanonical, currentEnv);
+
+    if (!adminHostname) {
+      return null;
+    }
+
+    const adminUrl = new URL(url);
+    adminUrl.hostname = adminHostname;
+    adminUrl.pathname = "/wp-admin/";
+    adminUrl.search = "";
+    adminUrl.hash = "";
+
+    return adminUrl.toString();
+  } catch {
+    return null;
+  }
+}
+
+function isAdminPage(hostname, pathname) {
+  const canonical = getCanonicalProdHostname(hostname);
+  return canonical.startsWith("admin.") || pathname.startsWith("/wp-admin");
+}
