@@ -33,6 +33,10 @@ if [[ -n "$CHROME_EXTENSION_KEY_PATH" ]]; then
     --no-sandbox \
     --pack-extension="$TMP_DIR" \
     --pack-extension-key="$CHROME_EXTENSION_KEY_PATH"
+  if [[ ! -f "${TMP_DIR}.crx" ]]; then
+    echo "Error: CRX package was not generated." >&2
+    exit 1
+  fi
   cp "${TMP_DIR}.crx" "$DIST_DIR/$CRX_NAME"
   chmod 644 "$DIST_DIR/$CRX_NAME"
 
@@ -59,6 +63,10 @@ if not version:
 print(version)
 PY
 )"
+  if [[ -z "$VERSION" ]]; then
+    echo "Error: extension version could not be read from manifest." >&2
+    exit 1
+  fi
   APP_ID="$(python - "$CHROME_EXTENSION_KEY_PATH" <<'PY'
 import hashlib
 import subprocess
@@ -72,16 +80,20 @@ try:
     )
 except subprocess.CalledProcessError as exc:
     details = exc.output.decode(errors="replace").strip()
-    if details:
-        print(f"Error: failed to extract public key from {pem_path}: {details}", file=sys.stderr)
-    else:
-        print(f"Error: failed to extract public key from {pem_path}", file=sys.stderr)
+    print(
+        f"Error: failed to extract public key from {pem_path}: {details or 'no output from openssl'}",
+        file=sys.stderr,
+    )
     sys.exit(1)
 
 digest = hashlib.sha256(public_der).hexdigest()[:32]
 print("".join(chr(ord("a") + int(c, 16)) for c in digest))
 PY
 )"
+  if [[ -z "$APP_ID" ]]; then
+    echo "Error: extension app ID could not be generated from key." >&2
+    exit 1
+  fi
 
   BASE_URL="${PAGES_BASE_URL%/}"
   CRX_URL="$BASE_URL/downloads/$CRX_NAME"
