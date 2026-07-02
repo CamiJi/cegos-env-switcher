@@ -28,12 +28,13 @@ if [[ -n "$CHROME_EXTENSION_KEY_PATH" ]]; then
     exit 1
   fi
 
-  rm -f "$ROOT_DIR/extension.crx"
+  rm -f "${TMP_DIR}.crx"
   google-chrome \
     --no-sandbox \
-    --pack-extension="$ROOT_DIR/extension" \
+    --pack-extension="$TMP_DIR" \
     --pack-extension-key="$CHROME_EXTENSION_KEY_PATH"
-  mv "$ROOT_DIR/extension.crx" "$DIST_DIR/$CRX_NAME"
+  cp "${TMP_DIR}.crx" "$DIST_DIR/$CRX_NAME"
+  chmod 644 "$DIST_DIR/$CRX_NAME"
 
   VERSION="$(python -c "import json; print(json.load(open('$MANIFEST_PATH', encoding='utf-8'))['version'])")"
   APP_ID="$(python - "$CHROME_EXTENSION_KEY_PATH" <<'PY'
