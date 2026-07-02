@@ -122,8 +122,7 @@ function configureAdminButton(buttonId, tab) {
   const url = new URL(tab.url);
 
   if (isAdminPage(url.hostname, url.pathname)) {
-    button.disabled = true;
-    button.classList.add("is-current");
+    button.closest(".actions--admin").style.display = "none";
     return;
   }
 
