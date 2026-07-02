@@ -24,8 +24,8 @@
         </p>
 
         <div class="hero__actions">
-          <a class="button" href="./downloads/cegos-env-switcher.zip" download>
-            Télécharger l’extension
+          <a class="button" href="./downloads/cegos-env-switcher.crx" download>
+            Télécharger l’extension (.crx)
           </a>
           <a class="button button--secondary" href="#installation">
             Guide d’installation
@@ -57,15 +57,51 @@
       </section>
 
       <section id="installation" class="card">
-        <h2>Installation</h2>
+        <h2>Installation initiale (une seule fois)</h2>
         <ol>
-          <li>Télécharger le zip de l’extension.</li>
-          <li>Dézipper l’archive sur votre machine.</li>
+          <li>Télécharger <code>cegos-env-switcher.crx</code>.</li>
           <li>Ouvrir <code>chrome://extensions</code>.</li>
           <li>Activer le mode développeur.</li>
-          <li>Cliquer sur <strong>Load unpacked</strong> / <strong>Charger l’extension non empaquetée</strong>.</li>
-          <li>Sélectionner le dossier dézippé.</li>
+          <li>Glisser-déposer le fichier <code>.crx</code> dans la page puis confirmer l’installation.</li>
         </ol>
+      </section>
+
+      <section class="card">
+        <h2>Mises à jour automatiques</h2>
+        <p>
+          Après l’installation initiale, Chrome vérifie automatiquement les mises à jour via
+          <code>updates.xml</code>. Vous n’avez rien à réinstaller manuellement.
+        </p>
+      </section>
+
+      <section class="card">
+        <h2>Vérifier la version installée</h2>
+        <ol>
+          <li>Ouvrir <code>chrome://extensions</code>.</li>
+          <li>Trouver <strong>CEGOS Env Switcher</strong>.</li>
+          <li>Comparer la version affichée avec la version ci-dessous.</li>
+        </ol>
+      </section>
+
+      <section class="card">
+        <h2>Dépannage rapide</h2>
+        <ul>
+          <li>Cliquer sur <strong>Mettre à jour</strong> dans <code>chrome://extensions</code>.</li>
+          <li>Fermer puis relancer Chrome.</li>
+          <li>Vérifier que les URLs suivantes sont accessibles :</li>
+          <li><a href="./updates.xml">updates.xml</a></li>
+          <li><a href="./downloads/cegos-env-switcher.crx">cegos-env-switcher.crx</a></li>
+        </ul>
+      </section>
+
+      <section class="card">
+        <h2>Checklist de validation</h2>
+        <ul>
+          <li>Nouvelle version détectée après bump de la version dans le manifest.</li>
+          <li><code>updates.xml</code> accessible publiquement.</li>
+          <li><code>cegos-env-switcher.crx</code> accessible publiquement.</li>
+          <li>Mise à jour fonctionnelle sur un poste test.</li>
+        </ul>
       </section>
 
       <section class="card">
