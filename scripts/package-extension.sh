@@ -36,17 +36,48 @@ if [[ -n "$CHROME_EXTENSION_KEY_PATH" ]]; then
   cp "${TMP_DIR}.crx" "$DIST_DIR/$CRX_NAME"
   chmod 644 "$DIST_DIR/$CRX_NAME"
 
-  VERSION="$(python -c "import json; print(json.load(open('$MANIFEST_PATH', encoding='utf-8'))['version'])")"
+  VERSION="$(python - "$MANIFEST_PATH" <<'PY'
+import json
+import sys
+
+manifest_path = sys.argv[1]
+try:
+    with open(manifest_path, encoding="utf-8") as manifest_file:
+        manifest = json.load(manifest_file)
+except FileNotFoundError:
+    print(f"Error: manifest file not found at {manifest_path}", file=sys.stderr)
+    sys.exit(1)
+except json.JSONDecodeError as exc:
+    print(f"Error: invalid JSON in {manifest_path}: {exc}", file=sys.stderr)
+    sys.exit(1)
+
+version = manifest.get("version")
+if not version:
+    print(f"Error: missing 'version' in {manifest_path}", file=sys.stderr)
+    sys.exit(1)
+
+print(version)
+PY
+)"
   APP_ID="$(python - "$CHROME_EXTENSION_KEY_PATH" <<'PY'
 import hashlib
 import subprocess
 import sys
 
 pem_path = sys.argv[1]
-public_der = subprocess.check_output(
-    ["openssl", "rsa", "-in", pem_path, "-pubout", "-outform", "DER"],
-    stderr=subprocess.DEVNULL,
-)
+try:
+    public_der = subprocess.check_output(
+        ["openssl", "rsa", "-in", pem_path, "-pubout", "-outform", "DER"],
+        stderr=subprocess.STDOUT,
+    )
+except subprocess.CalledProcessError as exc:
+    details = exc.output.decode(errors="replace").strip()
+    if details:
+        print(f"Error: failed to extract public key from {pem_path}: {details}", file=sys.stderr)
+    else:
+        print(f"Error: failed to extract public key from {pem_path}", file=sys.stderr)
+    sys.exit(1)
+
 digest = hashlib.sha256(public_der).hexdigest()[:32]
 print("".join(chr(ord("a") + int(c, 16)) for c in digest))
 PY
